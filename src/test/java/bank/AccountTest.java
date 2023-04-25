@@ -9,41 +9,44 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AccountTest {
-    Account account;
+    Account underTest;
     BigDecimal INITIAL_AMOUNT = new BigDecimal(1000);
 
     @BeforeEach
     void setUp() {
-        account = new Account();
-        account.setMoney(INITIAL_AMOUNT);
-        account.setAccountNumber(1);
+        underTest = new Account();
+        underTest.setMoney(INITIAL_AMOUNT);
+        underTest.setAccountNumber(1);
     }
 
     @Test
     void testNegativeWithdraw() {
-        assertThrows(IllegalStateException.class, () -> account.withdraw(new BigDecimal(-1)));
+        BigDecimal negativeAmount = new BigDecimal(-1);
+        assertThrows(IllegalStateException.class, () -> underTest.withdraw(negativeAmount));
     }
 
     @Test
     void testWithdrawAmountBiggerThanAccountBalance() {
-        assertThrows(IllegalStateException.class, () -> account.withdraw(INITIAL_AMOUNT.add(new BigDecimal(1))));
+        BigDecimal amountToBeWithdrawn = INITIAL_AMOUNT.add(new BigDecimal(1));
+        assertThrows(IllegalStateException.class, () -> underTest.withdraw(amountToBeWithdrawn));
     }
 
     @Test
     void testNegativeDeposit() {
-        assertThrows(IllegalStateException.class, () -> account.deposit(new BigDecimal(-1)));
+        BigDecimal negativeAmount = new BigDecimal(-1);
+        assertThrows(IllegalStateException.class, () -> underTest.deposit(negativeAmount));
     }
 
     @Test
     void testWithdraw() {
-        account.withdraw(new BigDecimal(100));
-        assertEquals(INITIAL_AMOUNT.subtract(new BigDecimal(100)), account.getMoney());
+        underTest.withdraw(new BigDecimal(100));
+        assertEquals(INITIAL_AMOUNT.subtract(new BigDecimal(100)), underTest.getMoney());
     }
 
     @Test
     void testDeposit() {
-        account.deposit(new BigDecimal(100));
-        assertEquals(INITIAL_AMOUNT.add(new BigDecimal(100)), account.getMoney());
+        underTest.deposit(new BigDecimal(100));
+        assertEquals(INITIAL_AMOUNT.add(new BigDecimal(100)), underTest.getMoney());
     }
 
     @Test
@@ -51,28 +54,33 @@ class AccountTest {
         Account other = new Account();
         other.setMoney(new BigDecimal(0));
         other.setAccountNumber(2);
-        account.transferTo(other, new BigDecimal(100));
-        assertTrue(account.getMoney().compareTo(INITIAL_AMOUNT.subtract(new BigDecimal(100))) == 0);
-        assertTrue(other.getMoney().compareTo(new BigDecimal(100)) == 0);
+        underTest.transferTo(other, new BigDecimal(100));
+        assertEquals(0, underTest.getMoney()
+                .compareTo(INITIAL_AMOUNT.subtract(new BigDecimal(100))));
+        assertEquals(0, other.getMoney()
+                .compareTo(new BigDecimal(100)));
     }
 
     @Test
     void testTransferToNegativeAmount() {
         Account other = new Account();
         other.setMoney(new BigDecimal(0));
-        assertThrows(IllegalStateException.class, () -> account.transferTo(other, new BigDecimal(-100)));
+        BigDecimal negativeAmount = new BigDecimal(-100);
+        assertThrows(IllegalStateException.class, () -> underTest.transferTo(other, negativeAmount));
     }
 
     @Test
     void testTransferToNotEnoughMoney() {
         Account other = new Account();
         other.setMoney(new BigDecimal(0));
-        assertThrows(IllegalStateException.class, () -> account.transferTo(other, INITIAL_AMOUNT.add(new BigDecimal(1))));
+        BigDecimal amount = INITIAL_AMOUNT.add(new BigDecimal(1));
+        assertThrows(IllegalStateException.class, () -> underTest.transferTo(other, amount));
     }
 
     @Test
     void testTransferToSameAccount() {
-        assertThrows(IllegalStateException.class, () -> account.transferTo(account, new BigDecimal(100)));
+        BigDecimal amount = new BigDecimal(100);
+        assertThrows(IllegalStateException.class, () -> underTest.transferTo(underTest, amount));
     }
 
 

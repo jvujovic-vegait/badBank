@@ -1,5 +1,6 @@
 package ch.engenius.bank;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -21,9 +22,7 @@ public class Bank {
         if (accounts.containsKey(accountNumber)) {
             throw new IllegalStateException("Account with number " + accountNumber + " is already registered");
         }
-        Account account = new Account();
-        account.setMoney(amount);
-        account.setAccountNumber(accountNumber);
+        Account account = new Account(amount, accountNumber);
         accounts.put(accountNumber, account);
         return account;
     }

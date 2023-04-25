@@ -1,10 +1,14 @@
 package ch.engenius.bank;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Account {
 
     private BigDecimal money;
@@ -27,10 +31,6 @@ public class Account {
         }
 
         setMoney(money.subtract(amount));
-    }
-
-    public synchronized BigDecimal getMoney() {
-        return money;
     }
 
     private boolean hasEnoughMoney(BigDecimal amount) {
@@ -68,5 +68,9 @@ public class Account {
         }
         this.withdraw(amount);
         account.deposit(amount);
+    }
+
+    public synchronized BigDecimal getMoney() {
+        return money;
     }
 }

@@ -10,33 +10,35 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BankTest {
 
-    Bank bank;
+    Bank underTest;
 
     @BeforeEach
     void setUp() {
-        bank = new Bank();
+        underTest = new Bank();
     }
 
     @Test
     void testRegisterAccount() {
-        bank.registerAccount(1, new BigDecimal(1000));
-        assertTrue(bank.getAccounts().containsKey(1));
+        underTest.registerAccount(1, new BigDecimal(1000));
+        assertTrue(underTest.getAccounts().containsKey(1));
     }
 
     @Test
     void testRegisterAccountTwice() {
-        bank.registerAccount(1, new BigDecimal(1000));
-        assertThrows(IllegalStateException.class, () -> bank.registerAccount(1, new BigDecimal(1000)));
+        BigDecimal amount = new BigDecimal(1000);
+        int accountNumber = 1;
+        underTest.registerAccount(accountNumber, amount);
+        assertThrows(IllegalStateException.class, () -> underTest.registerAccount(accountNumber, amount));
     }
 
     @Test
     void testGetAccountNotRegistered() {
-        assertThrows(IllegalArgumentException.class, () -> bank.getAccount(1));
+        assertThrows(IllegalArgumentException.class, () -> underTest.getAccount(1));
     }
 
     @Test
     void testGetAccount() {
-        bank.registerAccount(1, new BigDecimal(1000));
-        assertNotNull(bank.getAccount(1));
+        underTest.registerAccount(1, new BigDecimal(1000));
+        assertNotNull(underTest.getAccount(1));
     }
 }

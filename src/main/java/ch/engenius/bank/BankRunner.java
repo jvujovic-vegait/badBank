@@ -61,10 +61,10 @@ public class BankRunner {
                 .map(Account::getMoney)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-
         if (sum.intValue() != totalExpectedMoney) {
             throw new IllegalStateException("We got " + sum + " != " + totalExpectedMoney + " (expected)");
         }
+
         log.info("Sanity check passed");
     }
 
