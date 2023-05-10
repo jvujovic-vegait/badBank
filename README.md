@@ -33,7 +33,7 @@ Your job is to find bugs and other problems in the implementation.
 
 First of all I have created a use case diagram in order to understand the business logic of the application and
 distinguish the main actors.
-![usecase.drawio.png](docs%2Fusecase.drawio.png)
+![usecase.png](docs%2Fusecase.png)
 Here I will note the most important things I have done to fix the code.
 
 1. BankRunnner class was recreated as an integration test since really all it did was testing. The code stayed pretty
