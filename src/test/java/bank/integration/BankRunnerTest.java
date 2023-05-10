@@ -1,6 +1,12 @@
-package ch.engenius.bank;
+package bank.integration;
 
+import ch.engenius.bank.data.Account;
+import ch.engenius.bank.data.Bank;
+import ch.engenius.bank.service.impl.AccountServiceImpl;
+import ch.engenius.bank.service.impl.BankServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Random;
@@ -8,25 +14,35 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @Slf4j
-public class BankRunner {
-
+class BankRunnerTest {
     private static final ExecutorService executor = Executors.newFixedThreadPool(8);
-
     private final Random random = new Random(43);
-    private final Bank bank = new Bank();
 
+    BankServiceImpl bankService;
+    AccountServiceImpl accountService;
+    Bank bank;
 
-    public static void main(String[] args) {
-        BankRunner runner = new BankRunner();
+    @BeforeEach
+    void setUp() {
+        bankService = new BankServiceImpl();
+        accountService = new AccountServiceImpl();
+        bank = new Bank("TestBank");
+    }
+
+    @Test
+    public void testBankRunner() {
         int accounts = 100;
         int defaultDeposit = 1000;
         int iterations = 10000;
-        runner.registerAccounts(accounts, defaultDeposit);
-        runner.sanityCheck(accounts * defaultDeposit);
-        runner.runBank(iterations, accounts);
-        runner.sanityCheck(accounts * defaultDeposit);
-
+        registerAccounts(accounts, defaultDeposit);
+        assertEquals(0, sumAccounts().compareTo(
+                BigDecimal.valueOf(accounts * defaultDeposit)));
+        runBank(iterations, accounts);
+        assertEquals(0, sumAccounts().compareTo(
+                BigDecimal.valueOf(accounts * defaultDeposit)));
     }
 
     private void runBank(int iterations, int maxAccount) {
@@ -45,28 +61,20 @@ public class BankRunner {
         BigDecimal transferAmount = BigDecimal.valueOf(random.nextDouble()).multiply(BigDecimal.valueOf(100));
         int accountInNumber = random.nextInt(maxAccount);
         int accountOutNumber = random.nextInt(maxAccount);
-        Account accIn = bank.getAccount(accountInNumber);
-        Account accOut = bank.getAccount(accountOutNumber);
-        accIn.transferTo(accOut, transferAmount);
+        Account accIn = accountService.findAccountByNumber(bank, accountInNumber);
+        Account accOut = accountService.findAccountByNumber(bank, accountOutNumber);
+        accountService.transfer(accIn, accOut, transferAmount);
     }
 
     private void registerAccounts(int number, int defaultMoney) {
         for (int i = 0; i < number; i++) {
-            bank.registerAccount(i, BigDecimal.valueOf(defaultMoney));
+            bankService.registerAccount(bank, i, BigDecimal.valueOf(defaultMoney));
         }
     }
 
-    private void sanityCheck(int totalExpectedMoney) {
-        BigDecimal sum = bank.getAccounts().values().stream()
+    private BigDecimal sumAccounts() {
+        return bank.getAccounts().values().stream()
                 .map(Account::getMoney)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        if (sum.intValue() != totalExpectedMoney) {
-            throw new IllegalStateException("We got " + sum + " != " + totalExpectedMoney + " (expected)");
-        }
-
-        log.info("Sanity check passed");
     }
-
-
 }
